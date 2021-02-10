@@ -18,7 +18,7 @@ class m210210_115014_book extends Migration
             'isbn' => $this->integer()->notNull()->unique(),
             'page_count' => $this->integer(5),
             'published_date' => $this->dateTime(),
-            'thumbnail_url' => $this->string(255),
+            'thumbnail_url' => $this->text(),
             'shot_description' => $this->text(),
             'long_description' => $this->text(),
             'status' => $this->string(255)
@@ -33,11 +33,7 @@ class m210210_115014_book extends Migration
     public function safeDown()
     {
         $this->dropTable('book');
-<<<<<<< HEAD
         return true;
-=======
-        return true; // comment for git test
->>>>>>> d3cc671bf2d4ec332d9e4ada7f47b777098078f3
     }
 
     /*

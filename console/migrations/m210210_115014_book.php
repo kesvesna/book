@@ -33,7 +33,11 @@ class m210210_115014_book extends Migration
     public function safeDown()
     {
         $this->dropTable('book');
+<<<<<<< HEAD
         return true;
+=======
+        return true; // comment for git test
+>>>>>>> d3cc671bf2d4ec332d9e4ada7f47b777098078f3
     }
 
     /*

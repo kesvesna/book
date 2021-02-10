@@ -12,7 +12,17 @@ class m210210_115014_book extends Migration
      */
     public function safeUp()
     {
-        
+        $this->createTable('book', [
+            'id' => $this->primaryKey(),
+            'title' => $this->string(255)->notNull()->unique(),
+            'isbn' => $this->integer()->notNull()->unique(),
+            'page_count' => $this->integer(2),
+            'category_id' => $this->integer()->defaultValue(1),
+            'shot_description' => $this->text(),
+            'long_description' => $this->text(),
+        ]);
+
+
     }
 
     /**
@@ -20,8 +30,7 @@ class m210210_115014_book extends Migration
      */
     public function safeDown()
     {
-        echo "m210210_115014_book cannot be reverted.\n";
-
+        $this->dropTable('book');
         return false;
     }
 

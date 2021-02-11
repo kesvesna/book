@@ -18,7 +18,7 @@ class m210210_174646_authors extends Migration
             'name' => $this->string(255)->notNull()->unique()
         ]);
 
-        $faker = Factory::create();
+        /*$faker = Factory::create();
 
         for($i = 0; $i < 10; $i++)
         {
@@ -42,7 +42,7 @@ class m210210_174646_authors extends Migration
                 //'dg', 'address'
             ], $counter_rates)->execute();
             unset($counter_rates);
-        }
+        }*/
         //die('Data generation is complete!');
     }
 

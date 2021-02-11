@@ -16,7 +16,7 @@ class m210210_185827_book extends Migration
         $this->createTable('book', [
             'id' => $this->primaryKey(),
             'title' => $this->string(255)->notNull(),
-            'isbn' => $this->integer()->notNull(),
+            'isbn' => $this->string(255)->null()->defaultValue('0'),
             'page_count' => $this->integer(5),
             'published_date' => $this->dateTime(),
             'thumbnail_url' => $this->text(),
@@ -35,7 +35,7 @@ class m210210_185827_book extends Migration
         );
 
 
-        $faker = Factory::create();
+        /*$faker = Factory::create();
 
         for($i = 0; $i < 10; $i++)
         {
@@ -64,7 +64,7 @@ class m210210_185827_book extends Migration
                 //'dg', 'address'
             ], $counter_rates)->execute();
             unset($counter_rates);
-        }
+        }*/
         //die('Data generation is complete!');
     }
 

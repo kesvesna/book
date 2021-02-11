@@ -19,9 +19,7 @@ class m210210_175229_category extends Migration
         ]);
 
         $faker = Factory::create();
-        $categories = ['Новинка', 'Open Source', 'Mobile', 'Java', 'Software Engineering',
-            'Internet', 'Web Development', 'Microsoft .NET', 'Microsoft' ,
-            'Next Deneration Databases'];
+        $categories = ['Новинки'];
         for($i = 0; $i < count($categories); $i++)
         {
             //$counter_rates = [];

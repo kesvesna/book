@@ -18,7 +18,7 @@ class m210210_185350_status extends Migration
             'name' => $this->string(255)->notNull()->unique(),
         ]);
 
-        $faker = Factory::create();
+        /*$faker = Factory::create();
         $status = ['PUBLISH'];
         for($i = 0; $i < count($status); $i++)
         {
@@ -39,7 +39,7 @@ class m210210_185350_status extends Migration
                 //'dg', 'address'
             ], $counter_rates)->execute();
             unset($counter_rates);
-        }
+        }*/
 
     }
 

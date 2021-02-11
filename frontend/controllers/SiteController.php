@@ -1,6 +1,12 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\BookAuthor;
+use common\models\BookCategory;
+use common\models\BookSearch;
+use common\models\Book;
+use common\models\Category;
+use common\models\Status;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -14,6 +20,9 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use common\models\Authors;
+use common\models\AuthorsSearch;
+use yii\web\NotFoundHttpException;
 
 /**
  * Site controller
@@ -74,8 +83,13 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $searchModel = new BookSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index');
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**
@@ -162,6 +176,128 @@ class SiteController extends Controller
         return $this->render('signup', [
             'model' => $model,
         ]);
+    }
+
+
+    public function actionParser () {
+        $model = new Book();
+
+        if ($model->load(Yii::$app->request->post()) && isset($_POST['parser-button']) ) {
+            // get data from url
+            $j = @file_get_contents($model->parserSourceAddress);
+            // transform data to assoc array
+            $data = json_decode($j, true);
+
+            $all_books_count = count($data);
+            $new_books_count = 0;
+            $new_categories = 0;
+            $new_authors = 0;
+
+            //echo '<pre>';
+            //var_dump($data);
+            //echo '</pre>';
+            //die;
+
+            foreach($data as $value){
+                // fill table book
+                $newBook = new Book();
+                $newBook->title = $value['title'];
+                $newBook->isbn = $value['isbn'];
+                $newBook->published_date = date('Y-m-d H:i:s', strtotime($value['publishedDate']['$date']));
+                $newBook->short_description = $value['shortDescription'];
+                $newBook->long_description = $value['longDescription'];
+
+
+                if (!empty($value['status'])){
+                    // search exist status
+                    $status = Status::find()->andWhere(['name'=>$value['status']])->one();
+                    // if not exist, save new status and get his id
+                    if(empty($status)){
+                        $newStatus = new Status();
+                        $newStatus->name = $value['status'];
+                        $newStatus->save(false);
+                        $newBook->status_id = $newStatus->id;
+                        // else write exist status id in book id
+                    } else {
+                        $newBook->status_id = $status->id;
+                    }
+                }
+
+                // if something wrong, book get default status = 1
+                if(empty($newBook->status_id)){
+                    $newBook->status_id = 1;
+                }
+
+                $newBook->page_count = $value['pageCount'];
+                $newBook->thumbnail_url = $value['thumbnailUrl'];
+
+                $existBook = Book::find()->andWhere([
+                    'isbn' => $newBook->isbn,
+                    'title' => $newBook->title,
+                    'published_date' => $newBook->published_date
+                ])->all();
+
+                if(empty($existBook)){
+                    $newBook->save(false);
+                    $new_books_count++;
+
+                    foreach($value['authors'] as $author_name){
+                        $author = Authors::find()->andWhere(['name'=>$author_name])->one();
+                        if(!empty($author)){
+                            $book_author = new BookAuthor();
+                            $book_author->book_id = $newBook->id;
+                            $book_author->author_id = $author->id;
+                            $book_author->save(false);
+                        }else {
+                            $author = new Authors();
+                            $author->name = $author_name;
+                            $author->save(false);
+                            $new_authors++;
+
+                            $book_author = new BookAuthor();
+                            $book_author->author_id = $author->id;
+                            $book_author->book_id = $newBook->id;
+                            $book_author->save(false);
+                        }
+
+                    }
+
+                    foreach($value['categories'] as $category_name){
+                        $category = Category::find()->andWhere(['name'=>$category_name])->one();
+                        if(!empty($category)){
+                            $book_category = new BookCategory();
+                            $book_category->book_id = $newBook->id;
+                            $book_category->category_id = $category->id;
+                            $book_category->save(false);
+                        }else {
+                            $category = new Category();
+                            $category->name = $category_name;
+                            $category->save(false);
+                            $new_categories++;
+
+                            $book_category = new BookCategory();
+                            $book_category->book_id = $newBook->id;
+                            $book_category->category_id = $category->id;
+                            $book_category->save(false);
+                        }
+
+                    }
+                }
+
+            }
+
+            Yii::$app->session->setFlash('success', 'Парсинг закончен, всего книг в файле '
+                .$all_books_count.', новых записанных в базу '.$new_books_count.', новых категорий '.
+                $new_categories.', новых авторов '.$new_authors
+            );
+            return $this->render ('parser',
+                ['model'=>$model]);
+
+
+        }
+
+        return $this->render ('parser',
+            ['model'=>$model]);
     }
 
     /**
@@ -257,5 +393,34 @@ class SiteController extends Controller
         return $this->render('resendVerificationEmail', [
             'model' => $model
         ]);
+    }
+
+    /**
+     * Displays a single Authors model.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionView($id)
+    {
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+
+    /**
+     * Finds the Authors model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Authors the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Book::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

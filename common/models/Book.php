@@ -41,8 +41,8 @@ class Book extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'isbn', 'status_id'], 'required'],
-            [['isbn', 'page_count', 'status_id'], 'integer'],
+            [['title', 'status_id'], 'required'],
+            [['page_count', 'status_id'], 'integer'],
             [['published_date'], 'safe'],
             [['thumbnail_url', 'short_description', 'long_description', 'parserSourceAddress'], 'string'],
             [['title'], 'string', 'max' => 255],

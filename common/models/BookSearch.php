@@ -59,7 +59,6 @@ class BookSearch extends Book
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'isbn' => $this->isbn,
             'page_count' => $this->page_count,
             'published_date' => $this->published_date,
             'status_id' => $this->status_id,
@@ -68,7 +67,8 @@ class BookSearch extends Book
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'thumbnail_url', $this->thumbnail_url])
             ->andFilterWhere(['like', 'short_description', $this->short_description])
-            ->andFilterWhere(['like', 'long_description', $this->long_description]);
+            ->andFilterWhere(['like', 'long_description', $this->long_description])
+            ->andFilterWhere(['like', 'isbn', $this->isbn]);
 
         return $dataProvider;
     }

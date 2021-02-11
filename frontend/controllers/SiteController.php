@@ -197,6 +197,17 @@ class SiteController extends Controller
             $new_authors = 0;
 
             foreach($data as $value){
+
+                // check existing book in database
+                $existBook = Book::find()->andWhere([
+                    'isbn' => $value['isbn'],
+                    'title' => $value['title'],
+                    'published_date' => date('Y-m-d H:i:s', strtotime($value['publishedDate']['$date']))
+                ])->all();
+
+                // if book is not exist yet
+                if(empty($existBook)){
+
                 // fill table book
                 $newBook = new Book();
                 $newBook->title = $value['title'];
@@ -228,15 +239,6 @@ class SiteController extends Controller
                     $newBook->status_id = 1;
                 }
 
-                // check existing book in database
-                $existBook = Book::find()->andWhere([
-                    'isbn' => $newBook->isbn,
-                    'title' => $newBook->title,
-                    'published_date' => $newBook->published_date
-                ])->all();
-
-                // if book is not exist yet
-                if(empty($existBook)){
                     set_time_limit(30);
                     $newBook->save(false);
                     $new_books_count++;
@@ -296,19 +298,28 @@ class SiteController extends Controller
                             mkdir($path, 0777, true);
                         }
 
-                        // if good response from server
-                        if($picture_file = file_get_contents($url)){
 
-                            // save file to the directory
+                        $ch = curl_init();
+
+                        curl_setopt($ch, CURLOPT_HEADER, 0);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_URL, $url);
+
+                        // Проверяем наличие ошибок
+                        if (!curl_errno($ch)) {
+                            $picture_file = curl_exec($ch);
+                            //$picture_file = file_get_contents($url);
+                            curl_close($ch);
                             file_put_contents($path.'/'.$newBook->isbn.'.jpg', $picture_file);
                             $book_picture = new BookPicture();
                             $book_picture->book_id = $newBook->id;
                             $book_picture->picture_file_path = $path.'/'.$newBook->isbn.'.jpg';
                             $book_picture->save(false);
-                        } else {
+                           } else {
                             echo "Cannot read file ".$url." from server";
                             echo "<br><br>";
                         }
+
 
                     }
 

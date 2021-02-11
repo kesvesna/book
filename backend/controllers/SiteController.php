@@ -236,10 +236,10 @@ class SiteController extends Controller
                     $url = $newBook->thumbnail_url;
                     if (!empty($url) && $url != '') {
                         // set path
-                        $path = '../book_pictures/isbn_' . $newBook->isbn;
+                        $path = '../../frontend/book_pictures/isbn_' . $newBook->isbn;
                         // check directory exist, if not make new directory
-                        if (!file_exists('../book_pictures')) {
-                            mkdir('../book_pictures', 0777, true);
+                        if (!file_exists('../../frontend/book_pictures')) {
+                            mkdir('../../frontend/book_pictures', 0777, true);
                         }
                         if (!file_exists($path)) {
                             mkdir($path, 0777, true);

@@ -73,9 +73,8 @@ class m210210_185827_book extends Migration
      */
     public function safeDown()
     {
-        echo "m210210_185827_book cannot be reverted.\n";
-
-        return false;
+        $this->dropTable('book');
+        return true;
     }
 
     /*

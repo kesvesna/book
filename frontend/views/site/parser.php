@@ -22,7 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($model, 'parserSourceAddress')->textInput(['autofocus' => true, 'placeholder'=>'https://file_source.com']) ?>
 
             <div class="form-group">
-                <?= Html::submitButton('Распарсить', ['class' => 'btn btn-primary btn-block btn-lg', 'name' => 'parser-button', 'id' => 'parser-button']) ?>
+                <?= Html::submitButton('Распарсить', ['class' => 'btn btn-primary btn-block btn-lg',
+                    'name' => 'parser-button', 'id' => 'parser-button', 'value'=>1]) ?>
             </div>
 
             <?php ActiveForm::end(); ?>

@@ -34,10 +34,23 @@ $this->params['breadcrumbs'][] = $this->title;
             'isbn',
             'page_count',
             'published_date',
-            'thumbnail_url:ntext',
+
+            [
+                'attribute' => 'thumbnail_url',
+                'label' => 'Обложка книги',
+                'format' => 'raw',
+                'visible' => (!empty($model->thumbnail_url) ? true : false),
+                'value'=> Html::img($model->thumbnail_url, ['alt' => 'Обложка книги']),
+            ],
+
             'short_description:ntext',
             'long_description:ntext',
-            'status_id',
+
+            [
+                'attribute' => 'status.name',
+                'headerOptions' => ['width' => '100'],
+            ],
+
         ],
     ]) ?>
 

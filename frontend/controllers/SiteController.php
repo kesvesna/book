@@ -3,6 +3,7 @@ namespace frontend\controllers;
 
 use common\models\BookAuthor;
 use common\models\BookCategory;
+use common\models\BookPicture;
 use common\models\BookSearch;
 use common\models\Book;
 use common\models\Category;
@@ -182,9 +183,11 @@ class SiteController extends Controller
     public function actionParser () {
         $model = new Book();
 
-        if ($model->load(Yii::$app->request->post()) && isset($_POST['parser-button']) ) {
+        if ($model->load(Yii::$app->request->post()) AND isset($_POST['parser-button']) AND !empty($_POST['parser-button'])) {
+
             // get data from url
             $j = @file_get_contents($model->parserSourceAddress);
+
             // transform data to assoc array
             $data = json_decode($j, true);
 
@@ -192,11 +195,6 @@ class SiteController extends Controller
             $new_books_count = 0;
             $new_categories = 0;
             $new_authors = 0;
-
-            //echo '<pre>';
-            //var_dump($data);
-            //echo '</pre>';
-            //die;
 
             foreach($data as $value){
                 // fill table book
@@ -206,6 +204,8 @@ class SiteController extends Controller
                 $newBook->published_date = date('Y-m-d H:i:s', strtotime($value['publishedDate']['$date']));
                 $newBook->short_description = $value['shortDescription'];
                 $newBook->long_description = $value['longDescription'];
+                $newBook->page_count = $value['pageCount'];
+                $newBook->thumbnail_url = $value['thumbnailUrl'];
 
 
                 if (!empty($value['status'])){
@@ -228,16 +228,16 @@ class SiteController extends Controller
                     $newBook->status_id = 1;
                 }
 
-                $newBook->page_count = $value['pageCount'];
-                $newBook->thumbnail_url = $value['thumbnailUrl'];
-
+                // check existing book in database
                 $existBook = Book::find()->andWhere([
                     'isbn' => $newBook->isbn,
                     'title' => $newBook->title,
                     'published_date' => $newBook->published_date
                 ])->all();
 
+                // if book is not exist yet
                 if(empty($existBook)){
+                    set_time_limit(30);
                     $newBook->save(false);
                     $new_books_count++;
 
@@ -282,6 +282,36 @@ class SiteController extends Controller
                         }
 
                     }
+
+                    // get picture file
+                    $url = $newBook->thumbnail_url;
+                    if(!empty($url) && $url != ''){
+                        // set path
+                        $path = '../book_pictures/isbn_'.$newBook->isbn;
+                        // check directory exist, if not make new directory
+                        if(!file_exists('../book_pictures')){
+                            mkdir('../book_pictures', 0777, true);
+                        }
+                        if(!file_exists($path)){
+                            mkdir($path, 0777, true);
+                        }
+
+                        // if good response from server
+                        if($picture_file = file_get_contents($url)){
+
+                            // save file to the directory
+                            file_put_contents($path.'/'.$newBook->isbn.'.jpg', $picture_file);
+                            $book_picture = new BookPicture();
+                            $book_picture->book_id = $newBook->id;
+                            $book_picture->picture_file_path = $path.'/'.$newBook->isbn.'.jpg';
+                            $book_picture->save(false);
+                        } else {
+                            echo "Cannot read file ".$url." from server";
+                            echo "<br><br>";
+                        }
+
+                    }
+
                 }
 
             }
@@ -403,8 +433,9 @@ class SiteController extends Controller
      */
     public function actionView($id)
     {
+            $model = Book::findOne($id);
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -423,4 +454,5 @@ class SiteController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

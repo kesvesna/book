@@ -35,6 +35,12 @@ $this->title = 'Книги';
             ],
 
             [
+                'attribute' => 'category_id',
+                'headerOptions' => ['width' => '100'],
+                'value' => 'category.name',
+            ],
+
+            [
 
                 'attribute' => 'isbn',
                 'headerOptions' => ['width' => '100'],

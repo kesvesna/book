@@ -25,6 +25,7 @@ class Book extends \yii\db\ActiveRecord
 {
 
     public $parserSourceAddress = "";
+    public $picture = "";
 
     /**
      * {@inheritdoc}

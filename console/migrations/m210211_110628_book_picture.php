@@ -14,7 +14,7 @@ class m210211_110628_book_picture extends Migration
     {
         $this->createTable('book_picture', [
             'id' => $this->primaryKey(),
-            'picture_file_path' => $this->string(255)->null()->defaultValue('0'),
+            'picture_file_path' => $this->text(),
             'book_id' => $this->integer()->notNull(),
         ]);
 

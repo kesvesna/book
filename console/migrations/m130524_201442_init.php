@@ -15,15 +15,27 @@ class m130524_201442_init extends Migration
         $this->createTable('{{%user}}', [
             'id' => $this->primaryKey(),
             'username' => $this->string()->notNull()->unique(),
+            'admin' => $this->boolean()->defaultValue(0),
             'auth_key' => $this->string(32)->notNull(),
             'password_hash' => $this->string()->notNull(),
             'password_reset_token' => $this->string()->unique(),
             'email' => $this->string()->notNull()->unique(),
-
-            'status' => $this->smallInteger()->notNull()->defaultValue(10),
+            'status' => $this->smallInteger()->notNull(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
+
+        $this->insert('user', [
+            'username' => 'admin',
+            'admin' => '1',
+            'auth_key' => 'iYplI50-6uxaQxENiGsZyOLuJLfGlG4X',
+            'password_hash' => '$2y$13$lBVcrTTBfet6BgAgKnv9/eM5vH0X9/TZHqKJdRpFFzI0TnB7nkJgW',
+            'password_reset_token' => 'qCUxD7mFHa6ubGfFURDClbOtRUJwuXsH_1613072427',
+            'email' => 'kesvesna@rambler.ru',
+            'status' => 10,
+            'created_at' => 1613072427,
+            'updated_at' => 1613072427,
+        ]);
     }
 
     public function down()

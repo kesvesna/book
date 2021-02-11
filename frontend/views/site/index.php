@@ -34,11 +34,11 @@ $this->title = 'Книги';
              'value' => 'title' ,
             ],
 
-            [
-                'attribute' => 'category_id',
-                'headerOptions' => ['width' => '100'],
-                'value' => 'category.name',
-            ],
+            //[
+               // 'attribute' => 'category_id',
+               // 'headerOptions' => ['width' => '100'],
+               // 'value' => 'category.name',
+           // ],
 
             [
 
@@ -48,9 +48,12 @@ $this->title = 'Книги';
             ],
 
             [
+
                 'attribute' => 'status_id',
-                'headerOptions' => ['width' => '100'],
-                'value' => 'status.name',
+                'value' => 'status.name' ,
+                'filter' => Html::activeDropDownList($searchModel, 'status_id', ArrayHelper::map
+                (\common\models\Status::find()->asArray()->all(), 'id', 'name'),
+                    ['class'=>'form-control','prompt' => 'Все']),
             ],
 
 
@@ -71,16 +74,12 @@ $this->title = 'Книги';
             ],*/
 
             /* [
-                // 'attribute' => 'town_id',
+
                 'attribute' => 'equipment_id',
-                // 'headerOptions' => ['width' => '180'],
-                // $trk = Trk::findOne('trk_id'),
-               // 'visible'=>(bool)$user->sadmin,
-               'filter'=>false,
                 'value' => 'equipment.name' ,
-               // 'filter' => Html::activeDropDownList($searchModel, 'system_id', ArrayHelper::map
-               // (\common\models\System::find()->asArray()->all(), 'id', 'name'),
-                 //   ['class'=>'form-control','prompt' => 'Все']),
+                'filter' => Html::activeDropDownList($searchModel, 'system_id', ArrayHelper::map
+                (\common\models\System::find()->asArray()->all(), 'id', 'name'),
+                    ['class'=>'form-control','prompt' => 'Все']),
             ],*/
 
              ['class' => 'yii\grid\ActionColumn',

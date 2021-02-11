@@ -65,7 +65,7 @@ class Book extends \yii\db\ActiveRecord
             'short_description' => 'Краткое описание',
             'long_description' => 'Полное описание',
             'status_id' => 'Статус',
-            'parserSourceAddress' => 'Адрес источника файла с данными'
+            'parserSourceAddress' => 'Адрес источника'
         ];
     }
 

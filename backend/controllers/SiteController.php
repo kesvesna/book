@@ -34,7 +34,8 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index', 'parser', 'view', 'delete', 'update'],
+                        'actions' => ['login', 'error', 'index', 'parser',
+                            'view', 'delete', 'update', 'create'],
                         'allow' => true,
                     ],
                     [
@@ -303,6 +304,25 @@ class SiteController extends Controller
         return $this->render('view', [
             'model' => $model,
             'admin' => $admin,
+        ]);
+    }
+
+
+    /**
+     * Creates a new Book model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = new Book();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
         ]);
     }
 

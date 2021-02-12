@@ -1,7 +1,10 @@
 <?php
 
+use common\models\Status;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use yii\helpers\ArrayHelper;
+use yii\bootstrap\Modal;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Book */
@@ -26,10 +29,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'long_description')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'status_id')->textInput() ?>
+    <?php echo $form->field($model, 'status_id')->dropdownlist(ArrayHelper::map
+    (Status::find()->asArray()->all(), 'id', 'name'),
+    ['class' => 'form-control', 'prompt' => 'Выберите статус книги',
+    ])->label(false); ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success btn-lg btn-block']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

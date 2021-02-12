@@ -14,6 +14,14 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="book-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
+    <br>
+    <div class="row">
+        <div class="col-xs-12">
+            <?php if($admin){
+            echo Html::a('Добавить книгу', ['create', ], ['class' => 'btn btn-success btn-block btn-lg']);}?>
+        </div>
+    </div>
+    <br>
     <div class="row">
     <div class="col-xs-6">
         <?php if($admin){
@@ -41,6 +49,46 @@ $this->params['breadcrumbs'][] = $this->title;
             'isbn',
             'page_count',
             'published_date',
+
+            [
+                'attribute' => 'authors',
+                'label' => 'Автор',
+                'value' => function($model){
+                    $authors_name = \common\models\BookAuthor::find()
+                        ->select(['authors.name'])
+                        ->andWhere(['book_id'=> $model->id])
+                        ->join('inner join', 'authors',
+                            'authors.id = author_id', [])
+                        ->asArray()
+                        ->all();
+                    $authors_string = '';
+                    foreach ($authors_name as $value) {
+                        $authors_string .= $value['name'].', ';
+                    }
+                    $authors_string = rtrim($authors_string,', ');
+                    return $authors_string;
+                },
+            ],
+
+            [
+                'attribute' => 'categories',
+                'label' => 'Категория',
+                'value' => function($model){
+                    $categories_name = \common\models\BookCategory::find()
+                        ->select(['category.name'])
+                        ->andWhere(['book_id'=> $model->id])
+                        ->join('inner join', 'category',
+                            'category.id = category_id', [])
+                        ->asArray()
+                        ->all();
+                    $categories_string = '';
+                    foreach ($categories_name as $value) {
+                        $categories_string .= $value['name'].', ';
+                    }
+                    $categories_string = rtrim($categories_string,', ');
+                    return $categories_string;
+                },
+            ],
 
             [
                 'attribute' => 'thumbnail_url',

@@ -46,7 +46,7 @@ class Book extends \yii\db\ActiveRecord
             [['title', 'status_id'], 'required'],
             [['page_count', 'status_id'], 'integer'],
             [['published_date'], 'safe'],
-            [['thumbnail_url', 'short_description', 'long_description', 'parserSourceAddress'], 'string'],
+            [['thumbnail_url', 'short_description', 'long_description', 'parserSourceAddress', 'isbn'], 'string'],
             [['title'], 'string', 'max' => 255],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::className(), 'targetAttribute' => ['status_id' => 'id']],
         ];

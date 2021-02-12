@@ -2,11 +2,12 @@
 
 use yii\helpers\Html;
 
+
 /* @var $this yii\web\View */
 /* @var $model common\models\Book */
-
-$this->title = 'Create Book';
-$this->params['breadcrumbs'][] = ['label' => 'Books', 'url' => ['index']];
+Yii::$app->language = 'ru-RU';
+$this->title = 'Добавить книгу';
+$this->params['breadcrumbs'][] = ['label' => 'Книги', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="book-create">

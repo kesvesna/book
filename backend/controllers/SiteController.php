@@ -75,6 +75,10 @@ class SiteController extends Controller
     public function actionIndex()
     {
 
+        if (Yii::$app->user->isGuest) {
+            return $this->redirect('site/login');
+        }
+
         $searchModel = new BookSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

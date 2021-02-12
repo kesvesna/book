@@ -32,3 +32,5 @@ phpunit.phar
 # vagrant runtime
 /.vagrant
 
+# pictures directory
+frontend/book_pictures

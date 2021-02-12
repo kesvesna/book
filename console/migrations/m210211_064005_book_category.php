@@ -13,6 +13,7 @@ class m210211_064005_book_category extends Migration
     public function safeUp()
     {
         $this->createTable('book_category', [
+            'id' => $this->primaryKey(),
             'book_id' => $this->integer()->notNull(),
             'category_id' => $this->integer()->notNull(),
         ]);

@@ -13,6 +13,7 @@ class m210211_063605_book_author extends Migration
     public function safeUp()
     {
         $this->createTable('book_author', [
+            'id' => $this->primaryKey(),
             'book_id' => $this->integer()->notNull(),
             'author_id' => $this->integer()->notNull(),
         ]);

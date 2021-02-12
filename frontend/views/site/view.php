@@ -36,6 +36,46 @@ $this->params['breadcrumbs'][] = $this->title;
             'published_date',
 
             [
+                'attribute' => 'authors',
+                'label' => 'Автор',
+                'value' => function($model){
+                    $authors_name = \common\models\BookAuthor::find()
+                        ->select(['authors.name'])
+                        ->andWhere(['book_id'=> $model->id])
+                        ->join('inner join', 'authors',
+                            'authors.id = author_id', [])
+                        ->asArray()
+                        ->all();
+                    $authors_string = '';
+                    foreach ($authors_name as $value) {
+                        $authors_string .= $value['name'].', ';
+                    }
+                    $authors_string = rtrim($authors_string,', ');
+                    return $authors_string;
+                },
+            ],
+
+           [
+                'attribute' => 'categories',
+                'label' => 'Категория',
+                'value' => function($model){
+                    $categories_name = \common\models\BookCategory::find()
+                        ->select(['category.name'])
+                        ->andWhere(['book_id'=> $model->id])
+                        ->join('inner join', 'category',
+                            'category.id = category_id', [])
+                        ->asArray()
+                        ->all();
+                    $categories_string = '';
+                    foreach ($categories_name as $value) {
+                        $categories_string .= $value['name'].', ';
+                    }
+                    $categories_string = rtrim($categories_string,', ');
+                    return $categories_string;
+                },
+            ],
+
+            [
                 'attribute' => 'thumbnail_url',
                 'label' => 'Обложка книги',
                 'format' => 'raw',
@@ -48,6 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'status.name',
+                'label' => 'Статус',
                 'headerOptions' => ['width' => '100'],
             ],
 

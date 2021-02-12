@@ -19,8 +19,6 @@ $this->title = 'Книги';
         'filterModel' => $searchModel,
         'columns' => [
 
-
-
              [
              'attribute' => 'id',
              'headerOptions' => ['width' => '60'],
@@ -34,11 +32,6 @@ $this->title = 'Книги';
              'value' => 'title' ,
             ],
 
-            //[
-               // 'attribute' => 'category_id',
-               // 'headerOptions' => ['width' => '100'],
-               // 'value' => 'category.name',
-           // ],
 
             [
 
@@ -50,37 +43,33 @@ $this->title = 'Книги';
             [
 
                 'attribute' => 'status_id',
+                'label' => 'Статус',
                 'value' => 'status.name' ,
                 'filter' => Html::activeDropDownList($searchModel, 'status_id', ArrayHelper::map
                 (\common\models\Status::find()->asArray()->all(), 'id', 'name'),
                     ['class'=>'form-control','prompt' => 'Все']),
             ],
 
+             /*[
+                     'attribute' => 'authors',
+                    'label' => 'Автор',
+                    'value' => function($searchModel){
+                        $authors_name = \common\models\BookAuthor::find()
+                                    ->select(['authors.name'])
+                                    ->andWhere(['book_id'=> $searchModel->id])
+                                    ->join('inner join', 'authors',
+                                        'authors.id = author_id', [])
+                                    ->asArray()
+                                    ->all();
+                        $authors_string = '';
+                        foreach ($authors_name as $value) {
+                            $authors_string .= $value['name'].', ';
+                        }
+                        $authors_string = rtrim($authors_string,', ');
+                        return $authors_string;
+                    },
+                     ],*/
 
-
-
-
-
-           /* [
-                // 'attribute' => 'town_id',
-                'attribute' => 'system_id',
-                // 'headerOptions' => ['width' => '180'],
-                // $trk = Trk::findOne('trk_id'),
-               // 'visible'=>(bool)$user->sadmin,
-                'value' => 'system.name' ,
-                'filter' => Html::activeDropDownList($searchModel, 'system_id', ArrayHelper::map
-                (\common\models\System::find()->asArray()->all(), 'id', 'name'),
-                    ['class'=>'form-control','prompt' => 'Все']),
-            ],*/
-
-            /* [
-
-                'attribute' => 'equipment_id',
-                'value' => 'equipment.name' ,
-                'filter' => Html::activeDropDownList($searchModel, 'system_id', ArrayHelper::map
-                (\common\models\System::find()->asArray()->all(), 'id', 'name'),
-                    ['class'=>'form-control','prompt' => 'Все']),
-            ],*/
 
              ['class' => 'yii\grid\ActionColumn',
             'template' => '{view}',

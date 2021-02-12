@@ -36,6 +36,18 @@ class m130524_201442_init extends Migration
             'created_at' => 1613072427,
             'updated_at' => 1613072427,
         ]);
+
+        $this->insert('user', [
+            'username' => 'user',
+            'admin' => '0',
+            'auth_key' => 'iYplI50-6uxaQxENiGsZyOLuJLfGlG4X',
+            'password_hash' => '$2y$13$lBVcrTTBfet6BgAgKnv9/eM5vH0X9/TZHqKJdRpFFzI0TnB7nkJgW',
+            'password_reset_token' => 'qCUxD7mFHa6ubGfFURDClbOtRUJwuXsH_1613072428',
+            'email' => 'kesvesna@gmail.com',
+            'status' => 10,
+            'created_at' => 1613072428,
+            'updated_at' => 1613072428,
+        ]);
     }
 
     public function down()

@@ -106,4 +106,20 @@ class Book extends \yii\db\ActiveRecord
         return $this->hasMany(Authors::className(), ['id' => 'author_id'])
             ->viaTable('book_author', ['book_id' => 'id']);
     }
+
+    public static function notExistBook ($isbn, $title, $published_date){
+
+        $existBook = Book::find()
+            ->andWhere([
+                'isbn' => $isbn,
+                'title' => $title,
+                'published_date' => date('Y-m-d H:i:s', $published_date)
+            ])->one();
+
+        if(empty($existBook)){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

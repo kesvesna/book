@@ -11,6 +11,7 @@ use common\models\Book;
 use common\models\Category;
 use common\models\Status;
 use common\models\User;
+use backend\models\Parser;
 use Yii;
 use yii\debug\models\search\Log;
 use yii\web\Controller;
@@ -137,11 +138,8 @@ class SiteController extends Controller
             AND isset($_POST['parser-button'])
             AND !empty($_POST['parser-button'])) {
 
-            // get data from url
-            $j = @file_get_contents($model->parserSourceAddress);
-
-            // transform data to assoc array
-            $data = json_decode($j, true);
+            $parser = new Parser();
+            $data = $parser->getFileContent($model->parserSourceAddress);
 
             $all_books_count = count($data);
             $new_books_count = 0;
@@ -150,15 +148,8 @@ class SiteController extends Controller
 
             foreach ($data as $value) {
 
-                // check existing book in database
-                $existBook = Book::find()->andWhere([
-                    'isbn' => $value['isbn'],
-                    'title' => $value['title'],
-                    'published_date' => date('Y-m-d H:i:s', strtotime($value['publishedDate']['$date']))
-                ])->all();
-
                 // if book is not exist yet
-                if (empty($existBook)) {
+                if (Book::notExistBook($value['isbn'], $value['title'], strtotime($value['publishedDate']['$date']))) {
 
                     // fill table book
                     $newBook = new Book();

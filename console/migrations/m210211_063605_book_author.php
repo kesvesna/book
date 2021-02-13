@@ -42,6 +42,8 @@ class m210211_063605_book_author extends Migration
      */
     public function safeDown()
     {
+        $this->dropForeignKey('fk-book_author-book_id', 'book_author');
+        $this->dropForeignKey('fk-book_author-author_id', 'book_author');
         $this->dropTable('book_author');
         return true;
     }

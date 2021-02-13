@@ -33,6 +33,8 @@ class m210211_110628_book_picture extends Migration
      */
     public function safeDown()
     {
+
+        $this->dropForeignKey('fk-book_picture-book_id', 'book_picture');
         $this->dropTable('book_picture');
         return true;
     }

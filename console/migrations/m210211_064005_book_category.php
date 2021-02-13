@@ -42,6 +42,8 @@ class m210211_064005_book_category extends Migration
      */
     public function safeDown()
     {
+        $this->dropForeignKey('fk-book_category-book_id', 'book_category');
+        $this->dropForeignKey('fk-book_category-author_id', 'book_category');
         $this->dropTable('book_category');
         return true;
     }

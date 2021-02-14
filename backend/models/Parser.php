@@ -13,7 +13,14 @@ class Parser extends Model
     public function rules()
     {
         return [
-            [['parserSourceAddress'], 'required'],
+            [['parserSourceAddress'], 'required']
+        ];
+    }
+
+    public function attributeLabels()
+    {
+        return [
+            'parserSourceAddress' => 'Адрес источника данных',
         ];
     }
 

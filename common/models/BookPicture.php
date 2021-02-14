@@ -57,4 +57,9 @@ class BookPicture extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Book::className(), ['id' => 'book_id']);
     }
+
+    public function fill($book_id, $picture_path){
+        $this->book_id = $book_id;
+        $this->picture_file_path = $picture_path;
+    }
 }

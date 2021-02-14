@@ -66,4 +66,25 @@ class BookAuthor extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Book::className(), ['id' => 'book_id']);
     }
+
+
+    public function fill($book_id, $author_id) {
+        $this->book_id = $book_id;
+        $this->author_id = $author_id;
+    }
+
+    public static function notExist($book_id, $author_id){
+
+        $existBookAuthor = BookAuthor::find()
+            ->andWhere([
+                'book_id' => $book_id,
+                'author_id' => $author_id
+            ])->one();
+
+        if(empty($existBookAuthor)){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

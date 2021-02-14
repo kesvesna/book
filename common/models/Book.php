@@ -45,7 +45,7 @@ class Book extends \yii\db\ActiveRecord
             [['title', 'status_id'], 'required'],
             [['page_count', 'status_id'], 'integer'],
             [['published_date'], 'safe'],
-            [['thumbnail_url', 'short_description', 'long_description', 'parserSourceAddress', 'isbn'], 'string'],
+            [['thumbnail_url', 'short_description', 'long_description', 'isbn'], 'string'],
             [['title'], 'string', 'max' => 255],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::className(), 'targetAttribute' => ['status_id' => 'id']],
         ];
@@ -66,7 +66,6 @@ class Book extends \yii\db\ActiveRecord
             'short_description' => 'Краткое описание',
             'long_description' => 'Полное описание',
             'status_id' => 'Статус',
-            'parserSourceAddress' => 'Адрес источника'
         ];
     }
 
@@ -106,16 +105,16 @@ class Book extends \yii\db\ActiveRecord
             ->viaTable('book_author', ['book_id' => 'id']);
     }
 
-    public static function notExist ($params = []){
+    public static function notExist ($params){
 
         $existBook = Book::find()
             ->andWhere([
                 'isbn' => $params['isbn'],
                 'title' => $params['title'],
-                'published_date' => date('Y-m-d H:i:s', $params['publishedDate']['$date'])
+                'published_date' => $params['publishedDate']['$date']
             ])->one();
 
-        if(empty($existBook)){
+        if($existBook){
             return true;
         } else {
             return false;

@@ -54,4 +54,19 @@ class Category extends \yii\db\ActiveRecord
     {
         return $this->hasMany(BookCategory::className(), ['category_id' => 'id']);
     }
+
+
+    public static function getCategoryId ($category_name){
+
+        $existCategory = Category::find()->andWhere(['name' => $category_name])->one();
+
+        if (empty($existCategory)) {
+            $newCategory = new Category();
+            $newCategory->name = $category_name;
+            $newCategory->save();
+            return $newCategory->id;
+        } else {
+            return $existCategory->id;
+        }
+    }
 }

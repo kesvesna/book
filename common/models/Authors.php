@@ -54,4 +54,19 @@ class Authors extends \yii\db\ActiveRecord
     {
         return $this->hasMany(BookAuthor::className(), ['author_id' => 'id']);
     }
+
+
+    public static function getAuthorId ($author_name){
+
+        $existAuthor = Authors::find()->andWhere(['name' => $author_name])->one();
+
+        if (empty($existAuthor)) {
+            $newAuthor = new Authors();
+            $newAuthor->name = $author_name;
+            $newAuthor->save(false);
+            return $newAuthor->id;
+        } else {
+            return $existAuthor->id;
+        }
+    }
 }

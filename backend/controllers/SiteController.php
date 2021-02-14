@@ -133,7 +133,7 @@ class SiteController extends Controller
     {
         $model = new Parser();
 
-        if ($model->load(Yii::$app->request->post()) && $_POST['parser-button'] === '1') {
+        if ($model->load(Yii::$app->request->post()) && !empty($_POST['Parser']['parserSourceAddress'])) {
 
             $data = $model->getFileContent();
 
@@ -144,17 +144,13 @@ class SiteController extends Controller
 
             foreach ($data as $value) {
 
-                $newBook = new Book();
-
                 if (Book::notExist($value)) {
 
-                    if(!empty($value)){
+                    // transform date for book model to view 0000-00-00 00:00:00
+                    $value['publishedDate']['$date'] = date('Y-m-d H:i:s', strtotime($value['publishedDate']['$date']));
 
-                        // transform date for book model (0000-00-00 00:00:00)
-                        $value['publishedDate']['$date'] = date('Y-m-d H:i:s', strtotime($value['publishedDate']['$date']));
-
-                        $newBook->fill($value);
-                    }
+                    $newBook = new Book();
+                    $newBook->fill($value);
 
                     if (!empty($value['status'])) {
 
@@ -165,62 +161,39 @@ class SiteController extends Controller
 
                     $new_books_count++;
 
-
                     if(!empty($value['authors'])){
 
                         foreach ($value['authors'] as $author_name) {
 
-                            $author = Authors::find()->andWhere(['name' => $author_name])->one();
+                                $author_id = Authors::getAuthorId($author_name);
 
-                            if (!empty($author)) {
-                                $book_author = new BookAuthor();
-                                $book_author->book_id = $newBook->id;
-                                $book_author->author_id = $author->id;
-                                $book_author->save(false);
-                            } else {
-                                $author = new Authors();
-                                $author->name = $author_name;
-                                $author->save(false);
-                                $new_authors++;
+                                if(BookAuthor::notExist($newBook->id, $author_id)){
 
-                                $book_author = new BookAuthor();
-                                $book_author->author_id = $author->id;
-                                $book_author->book_id = $newBook->id;
-                                $book_author->save(false);
-                            }
-
+                                    $book_author = new BookAuthor();
+                                    $book_author->fill($newBook->id, $author_id);
+                                    $book_author->save();
+                                }
                         }
                     }
-
 
                     if(!empty($value['categories'])){
 
                         foreach ($value['categories'] as $category_name) {
 
-                            $category = Category::find()->andWhere(['name' => $category_name])->one();
+                            $category_id = Category::getCategoryId($category_name);
 
-                            if (!empty($category)) {
-                                $book_category = new BookCategory();
-                                $book_category->book_id = $newBook->id;
-                                $book_category->category_id = $category->id;
-                                $book_category->save(false);
-                            } else {
-                                $category = new Category();
-                                $category->name = $category_name;
-                                $category->save(false);
-                                $new_categories++;
+                            if(BookCategory::notExist($newBook->id, $category_id)){
 
                                 $book_category = new BookCategory();
-                                $book_category->book_id = $newBook->id;
-                                $book_category->category_id = $category->id;
-                                $book_category->save(false);
+                                $book_category->fill($newBook->id, $category_id);
+                                $book_category->save();
                             }
                         }
                     }
 
-
                     // get picture file
                     $url = $newBook->thumbnail_url;
+                    
                     if (!empty($url) && $url != '') {
                         // set path
                         $path = '../../frontend/book_pictures/isbn_' . $newBook->isbn;
@@ -228,12 +201,12 @@ class SiteController extends Controller
                         if (!file_exists('../../frontend/book_pictures')) {
                             mkdir('../../frontend/book_pictures', 0777, true);
                         }
+
                         if (!file_exists($path)) {
                             mkdir($path, 0777, true);
                         }
 
                         $ch = curl_init();
-
                         curl_setopt($ch, CURLOPT_HEADER, 0);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                         curl_setopt($ch, CURLOPT_URL, $url);
@@ -242,42 +215,37 @@ class SiteController extends Controller
 
                         // Проверяем наличие ошибок
                         if (!curl_errno($ch)) {
+
                             $picture_file = curl_exec($ch);
                             //$picture_file = file_get_contents($url);
                             curl_close($ch);
                             file_put_contents($path . '/' . $newBook->isbn . '.jpg', $picture_file);
+
                             $book_picture = new BookPicture();
-                            $book_picture->book_id = $newBook->id;
-                            $book_picture->picture_file_path = $path . '/' . $newBook->isbn . '.jpg';
-                            $book_picture->save(false);
+                            $book_picture->fill($newBook->id, $path.'/'.$newBook->isbn.'jpg');
+                            $book_picture->save();
+
                         } else {
+
                             echo "Cannot read file " . $url . " from server";
                             echo "<br><br>";
                         }
-
-
                     }
-
                 }
 
+                Yii::$app->session->setFlash('success',
+                    'Парсинг закончен, всего книг в файле ' . $all_books_count
+                    . ', новых записанных в базу ' . $new_books_count
+                    . ', новых категорий ' . $new_categories
+                    . ', новых авторов ' . $new_authors
+                );
             }
 
-            Yii::$app->session->setFlash('success', 'Парсинг закончен, всего книг в файле '
-                . $all_books_count . ', новых записанных в базу ' . $new_books_count . ', новых категорий ' .
-                $new_categories . ', новых авторов ' . $new_authors
-            );
-            return $this->render('parser',
-                ['model' => $model]);
-
-
-        } else {
-            Yii::$app->session->setFlash('danger', 'Адрес должен быть указан');
-            return $this->render('parser',
-                ['model' => $model]);
+            return $this->refresh();
         }
 
         return $this->render('parser',
-            ['model' => $model]);
+                                ['model' => $model]);
     }
 
 

@@ -66,4 +66,25 @@ class BookCategory extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Book::className(), ['id' => 'book_id']);
     }
+
+
+    public static function notExist($book_id, $category_id){
+
+        $existBookCategory = BookCategory::find()
+            ->andWhere([
+                'book_id' => $book_id,
+                'category_id' => $category_id
+            ])->one();
+
+        if(empty($existBookCategory)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function fill($book_id, $category_id) {
+        $this->book_id = $book_id;
+        $this->category_id = $category_id;
+    }
 }

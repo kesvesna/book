@@ -3,13 +3,23 @@
 namespace backend\models;
 
 use Yii;
+use yii\base\Model;
 
 
-class Parser
+class Parser extends Model
 {
-    public function getFileContent($url){
+    public $parserSourceAddress = '';
 
-        $content = @file_get_contents($url);
+    public function rules()
+    {
+        return [
+            [['parserSourceAddress'], 'required'],
+        ];
+    }
+
+    public function getFileContent(){
+
+        $content = @file_get_contents($this->parserSourceAddress);
 
         return json_decode($content, true);
     }

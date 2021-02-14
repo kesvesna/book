@@ -131,15 +131,11 @@ class SiteController extends Controller
 
     public function actionParser()
     {
+        $model = new Parser();
 
-        $model = new Book();
+        if ($model->load(Yii::$app->request->post()) && $_POST['parser-button'] === '1') {
 
-        if ($model->load(Yii::$app->request->post())
-            AND isset($_POST['parser-button'])
-            AND !empty($_POST['parser-button'])) {
-
-            $parser = new Parser();
-            $data = $parser->getFileContent($model->parserSourceAddress);
+            $data = $model->getFileContent();
 
             $all_books_count = count($data);
             $new_books_count = 0;
@@ -148,85 +144,80 @@ class SiteController extends Controller
 
             foreach ($data as $value) {
 
-                // if book is not exist yet
-                if (Book::notExistBook($value['isbn'], $value['title'], strtotime($value['publishedDate']['$date']))) {
+                $newBook = new Book();
 
-                    // fill table book
-                    $newBook = new Book();
-                    $newBook->title = $value['title'];
-                    $newBook->isbn = $value['isbn'];
-                    $newBook->published_date = date('Y-m-d H:i:s', strtotime($value['publishedDate']['$date']));
-                    $newBook->short_description = $value['shortDescription'];
-                    $newBook->long_description = $value['longDescription'];
-                    $newBook->page_count = $value['pageCount'];
-                    $newBook->thumbnail_url = $value['thumbnailUrl'];
+                if (Book::notExist($value)) {
 
+                    if(!empty($value)){
+
+                        // transform date for book model (0000-00-00 00:00:00)
+                        $value['publishedDate']['$date'] = date('Y-m-d H:i:s', strtotime($value['publishedDate']['$date']));
+
+                        $newBook->fill($value);
+                    }
 
                     if (!empty($value['status'])) {
-                        // search exist status
-                        $status = Status::find()->andWhere(['name' => $value['status']])->one();
-                        // if not exist, save new status and get his id
-                        if (empty($status)) {
-                            $newStatus = new Status();
-                            $newStatus->name = $value['status'];
-                            $newStatus->save(false);
-                            $newBook->status_id = $newStatus->id;
-                            // else write exist status id in book id
-                        } else {
-                            $newBook->status_id = $status->id;
-                        }
+
+                        $newBook->status_id = Status::getStatusId($value['status']);
                     }
 
-                    // if something wrong, book get default status = 1
-                    if (empty($newBook->status_id)) {
-                        $newBook->status_id = 1;
-                    }
+                    $newBook->save();
 
-                    set_time_limit(30);
-                    $newBook->save(false);
                     $new_books_count++;
 
-                    foreach ($value['authors'] as $author_name) {
-                        $author = Authors::find()->andWhere(['name' => $author_name])->one();
-                        if (!empty($author)) {
-                            $book_author = new BookAuthor();
-                            $book_author->book_id = $newBook->id;
-                            $book_author->author_id = $author->id;
-                            $book_author->save(false);
-                        } else {
-                            $author = new Authors();
-                            $author->name = $author_name;
-                            $author->save(false);
-                            $new_authors++;
 
-                            $book_author = new BookAuthor();
-                            $book_author->author_id = $author->id;
-                            $book_author->book_id = $newBook->id;
-                            $book_author->save(false);
+                    if(!empty($value['authors'])){
+
+                        foreach ($value['authors'] as $author_name) {
+
+                            $author = Authors::find()->andWhere(['name' => $author_name])->one();
+
+                            if (!empty($author)) {
+                                $book_author = new BookAuthor();
+                                $book_author->book_id = $newBook->id;
+                                $book_author->author_id = $author->id;
+                                $book_author->save(false);
+                            } else {
+                                $author = new Authors();
+                                $author->name = $author_name;
+                                $author->save(false);
+                                $new_authors++;
+
+                                $book_author = new BookAuthor();
+                                $book_author->author_id = $author->id;
+                                $book_author->book_id = $newBook->id;
+                                $book_author->save(false);
+                            }
+
                         }
-
                     }
 
-                    foreach ($value['categories'] as $category_name) {
-                        $category = Category::find()->andWhere(['name' => $category_name])->one();
-                        if (!empty($category)) {
-                            $book_category = new BookCategory();
-                            $book_category->book_id = $newBook->id;
-                            $book_category->category_id = $category->id;
-                            $book_category->save(false);
-                        } else {
-                            $category = new Category();
-                            $category->name = $category_name;
-                            $category->save(false);
-                            $new_categories++;
 
-                            $book_category = new BookCategory();
-                            $book_category->book_id = $newBook->id;
-                            $book_category->category_id = $category->id;
-                            $book_category->save(false);
+                    if(!empty($value['categories'])){
+
+                        foreach ($value['categories'] as $category_name) {
+
+                            $category = Category::find()->andWhere(['name' => $category_name])->one();
+
+                            if (!empty($category)) {
+                                $book_category = new BookCategory();
+                                $book_category->book_id = $newBook->id;
+                                $book_category->category_id = $category->id;
+                                $book_category->save(false);
+                            } else {
+                                $category = new Category();
+                                $category->name = $category_name;
+                                $category->save(false);
+                                $new_categories++;
+
+                                $book_category = new BookCategory();
+                                $book_category->book_id = $newBook->id;
+                                $book_category->category_id = $category->id;
+                                $book_category->save(false);
+                            }
                         }
-
                     }
+
 
                     // get picture file
                     $url = $newBook->thumbnail_url;
@@ -241,12 +232,13 @@ class SiteController extends Controller
                             mkdir($path, 0777, true);
                         }
 
-
                         $ch = curl_init();
 
                         curl_setopt($ch, CURLOPT_HEADER, 0);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                         curl_setopt($ch, CURLOPT_URL, $url);
+
+                        set_time_limit(60);
 
                         // Проверяем наличие ошибок
                         if (!curl_errno($ch)) {
@@ -278,6 +270,10 @@ class SiteController extends Controller
                 ['model' => $model]);
 
 
+        } else {
+            Yii::$app->session->setFlash('danger', 'Адрес должен быть указан');
+            return $this->render('parser',
+                ['model' => $model]);
         }
 
         return $this->render('parser',

@@ -24,7 +24,6 @@ use Yii;
 class Book extends \yii\db\ActiveRecord
 {
 
-    public $parserSourceAddress = "";
     public $picture = "";
     public $authors = [];
     public $categories = [];
@@ -107,13 +106,13 @@ class Book extends \yii\db\ActiveRecord
             ->viaTable('book_author', ['book_id' => 'id']);
     }
 
-    public static function notExistBook ($isbn, $title, $published_date){
+    public static function notExist ($params = []){
 
         $existBook = Book::find()
             ->andWhere([
-                'isbn' => $isbn,
-                'title' => $title,
-                'published_date' => date('Y-m-d H:i:s', $published_date)
+                'isbn' => $params['isbn'],
+                'title' => $params['title'],
+                'published_date' => date('Y-m-d H:i:s', $params['publishedDate']['$date'])
             ])->one();
 
         if(empty($existBook)){
@@ -121,5 +120,28 @@ class Book extends \yii\db\ActiveRecord
         } else {
             return false;
         }
+    }
+
+
+    public function fill($params = []){
+
+        if(!empty($params)){
+            $this->title = $params['title'];
+            $this->isbn = $params['isbn'];
+            $this->published_date = $params['publishedDate']['$date'];
+            $this->short_description = $params['shortDescription'];
+            $this->long_description = $params['longDescription'];
+            $this->page_count = $params['pageCount'];
+            $this->thumbnail_url = $params['thumbnailUrl'];
+        } else {
+            $this->title = 'Нет данных';
+            $this->isbn = 'Нет данных';
+            $this->published_date = '0000-00-00 00:00:00';
+            $this->short_description = 'Нет данных';
+            $this->long_description = 'Нет данных';
+            $this->page_count = 0;
+            $this->thumbnail_url = 'Нет данных';
+        }
+
     }
 }

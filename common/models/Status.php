@@ -54,4 +54,18 @@ class Status extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Book::className(), ['status_id' => 'id']);
     }
+
+    public static function getStatusId ($status_name){
+
+        $existStatus = Status::find()->andWhere(['name' => $status_name])->one();
+
+        if (empty($existStatus)) {
+            $newStatus = new Status();
+            $newStatus->name = $status_name;
+            $newStatus->save(false);
+            return $newStatus->id;
+        } else {
+            return $existStatus->id;
+        }
+    }
 }
